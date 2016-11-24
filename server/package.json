@@ -1,0 +1,23 @@
+{
+  "name": "primitive-server",
+  "version": "1.0.0",
+  "description": "Primitive go core saas",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.14.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subinsebastien/primserver.git"
+  },
+  "author": "Subin Sebastian",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/subinsebastien/primserver/issues"
+  },
+  "homepage": "https://github.com/subinsebastien/primserver#readme"
+}
