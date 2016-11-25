@@ -15,6 +15,13 @@ app.post('/queue/add', function(req, res) {
     var fileKey = req.body.filekey;
     var etag = req.body.etag;
     res.json({message: "Ok, job queued"});
+
+    db.serialize(function() {
+        if(!exists) {
+            db.run('CREATE TABLE ');
+    });
+    db.close();
+    
 });
 
 
