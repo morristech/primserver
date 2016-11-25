@@ -9,8 +9,7 @@ echo "Installing NPM packages"
 npm install
 
 echo "Killing primitive server"
-forever stop 0
+forever stopall
 
 echo "Starting server now..."
-forever start index.js
-
+forever --minUptime 100 start index.js

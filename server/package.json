@@ -1,10 +1,13 @@
 {
-  "name": "primitive-server",
+  "name": "primserver",
   "version": "1.0.0",
-  "description": "Primitive go core saas",
+  "description": "",
   "main": "index.js",
   "dependencies": {
-    "express": "^4.14.0"
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "fs": "^0.0.1-security",
+    "sqlite3": "^3.1.8"
   },
   "devDependencies": {},
   "scripts": {
