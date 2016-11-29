@@ -1,5 +1,5 @@
 echo "Deploying to prim server"
-git fetch origin/master
+git fetch origin master
 git reset --hard origin/master
 
 echo "Pulling primitive go project"
