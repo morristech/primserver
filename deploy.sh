@@ -3,7 +3,7 @@ git pull
 
 echo "Pulling primitive go project"
 go get -u github.com/fogleman/primitive
-cd server
+cd ec2
 
 echo "Installing NPM packages"
 npm install
@@ -12,4 +12,4 @@ echo "Killing primitive server"
 forever stopall
 
 echo "Starting server now..."
-forever --minUptime 100 start index.js
+forever --minUptime 100 start worker.js
