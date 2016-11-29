@@ -2,7 +2,7 @@ var aws = require('aws-sdk');
 var fs = require('fs');
 var spawn = require('child_process');
 
-if(!process.env.ACC_KEY_ID || !process.env.SEC_ACCESS_KEY) {
+if(!process.env.ACC_KEY_ID || !process.env.SEC_ACCESS_KEY || !process.env.SQS_QUEUE) {
     console.log("The environment is not appropriatly set");
     return;
 }
@@ -15,7 +15,7 @@ aws.config = {
 
 var s3 = new aws.S3();
 var sqs = new aws.SQS();
-var queueUrl = "https://sqs.us-east-1.amazonaws.com/873541805960/inputq";
+var queueUrl = process.env.SQS_QUEUE;
 
 
 setInterval(function() {
