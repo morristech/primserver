@@ -1,5 +1,6 @@
 echo "Deploying to prim server"
-git pull
+git fetch origin/master
+git reset --hard origin/master
 
 echo "Pulling primitive go project"
 go get -u github.com/fogleman/primitive
