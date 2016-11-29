@@ -37,7 +37,7 @@ var receiveMessage = function() {
                     processMessage(body, rcptHandle);          
                 }   
             } else {
-                console.log(data);
+                //console.log(data);
             }   
         }   
     });
