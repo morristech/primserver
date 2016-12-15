@@ -48,16 +48,15 @@ var processMessage = function(message, rcptHandle) {
     // param should be { Bucket: <bucket name>, Key: <key> }
     var params;
     try {
-        var msg = JSON.parse(message);
-        params.Key = msg.filekey;
+        //var msg = JSON.parse(message);
+        params.Key = message.filekey;
         params.Bucket = process.env.S3_IN_BUCKET
     } catch(error) {
         console.log("Unable to process message.");
         console.log(message);
-        return;
     }
 
-    if(params) {
+    if(params && params.Key && params.Bucket) {
         var filePath = '/tmp/' + params.Key;
         var file = fs.createWriteStream(filePath);
         file.on('close', function() {
