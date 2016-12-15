@@ -46,7 +46,7 @@ var receiveMessage = function() {
 
 var processMessage = function(message, rcptHandle) {
     // param should be { Bucket: <bucket name>, Key: <key> }
-    var params;
+    var params = {};
     try {
         var msg = JSON.parse(message);
         params.Key = msg.filekey;
