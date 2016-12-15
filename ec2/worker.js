@@ -1,8 +1,8 @@
 var aws = require('aws-sdk');
 var fs = require('fs');
-var spawn = require('child_process');
+var exec = require('child_process').exec;
 
-if(!process.env.ACC_KEY_ID || !process.env.SEC_ACCESS_KEY || !process.env.SQS_QUEUE) {
+if(!process.env.ACC_KEY_ID || !process.env.SEC_ACCESS_KEY || !process.env.SQS_QUEUE || !process.env.S3_IN_BUCKET) {
     console.log("The environment is not appropriatly set");
     return;
 }
@@ -32,6 +32,7 @@ var receiveMessage = function() {
             if(data.Messages) {
                 var message = data.Messages[0];
                 if(message) {
+                    console.log("Message received");
                     var body = message.Body;
                     var rcptHandle = message.ReceiptHandle;
                     processMessage(body, rcptHandle);          
@@ -55,31 +56,39 @@ var processMessage = function(message, rcptHandle) {
         console.log(error);
         console.log("Unable to process message.");
         console.log(message);
+        deleteMessage(rcptHandle);
+        return;
     }
 
     if(params && params.Key && params.Bucket) {
+        deleteMessage(rcptHandle);
         var filePath = '/tmp/' + params.Key;
         var file = fs.createWriteStream(filePath);
         file.on('close', function() {
             processOnFile('/tmp/', params.Key);
         });
+        console.log("Downloading file --> " + params.Key);
         s3.getObject(params).createReadStream().on('error', function(err) {
             console.log("Unable to get input file. Exiting");
+            deleteMessage(rcptHandle);
             return;
         }).pipe(file);
     }
-    deleteMessage(rcptHandle);
 };
 
 
 var processOnFile = function(tempFolder, fileKey) {
     console.log("Processing: " + fileKey);
-    var primitive = spawn('primitive', ['-i ' + tempFolder + fileKey, '-o ' + tempFolder + fileKey + '-out.jpg', '-n 50']);
-    primitive.on('close', (code) => {
-        console.log("Processing completed");
-        // Upload to S3
+    var primitive = 'primitive -i ' + tempFolder + fileKey + ' -o ' + tempFolder + fileKey + '-out.jpg -n 50';
+    //var primitive = spawn('ls', ['-l', '~']);
+    exec(primitive, (error, stdout, stderr) => {
+        if(error) {
+            console.log(error);
+            return;
+        }
+        console.log("Success --> " + fileKey + '-out.jpg');
+        // TODO Upload to S3
     });
-
 };
 
 
