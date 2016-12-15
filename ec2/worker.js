@@ -48,10 +48,11 @@ var processMessage = function(message, rcptHandle) {
     // param should be { Bucket: <bucket name>, Key: <key> }
     var params;
     try {
-        //var msg = JSON.parse(message);
-        params.Key = message.filekey;
+        var msg = JSON.parse(message);
+        params.Key = msg.filekey;
         params.Bucket = process.env.S3_IN_BUCKET
     } catch(error) {
+        console.log(error);
         console.log("Unable to process message.");
         console.log(message);
     }
