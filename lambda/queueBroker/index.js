@@ -2,7 +2,7 @@ var aws = require('aws-sdk');
 var sqs = new aws.SQS();
 
 exports.handler = function(event, context, callback) {
-    if(!event.filekey || !event.fcm_token) {
+    if(!event.filekey || !event.fcmtoken) {
         callback("Filekey or FCM Token Missing");
         return;
     }
