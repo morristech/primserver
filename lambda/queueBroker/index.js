@@ -7,7 +7,7 @@ exports.handler = function(event, context, callback) {
         return;
     }
 
-    if(event.filekey.length != 36) {
+    if(event.filekey.length != 36 && event.filekey.split('-').length != 5) {
         callback("Filekey looks strange");
         return;
     }
@@ -32,6 +32,7 @@ exports.handler = function(event, context, callback) {
         QueueUrl: process.env.SQS_Q_URL,
         MessageBody: JSON.stringify(event),
     };
+
     sqs.sendMessage(params, function(err, data) {
         if(err)
             callback(err);
