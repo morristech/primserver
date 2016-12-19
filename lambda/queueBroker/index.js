@@ -7,6 +7,27 @@ exports.handler = function(event, context, callback) {
         return;
     }
 
+    if(event.filekey.length != 36) {
+        callback("Filekey looks strange");
+        return;
+    }
+
+    if(event.shape) {
+        var shape = parseInt(event.shape);
+        if(shape < 0 || shape > 8) {
+            callback("Unknown shape");
+            return;
+        }
+    }
+
+    if(event.numshapes) {
+        var numshapes = parseInt(event.numshapes);
+        if(numshapes < 1 || numshapes > 200) {
+            callback("Invalid number of shapes");
+            return;
+        }
+    }
+
     var params = {
         QueueUrl: process.env.SQS_Q_URL,
         MessageBody: JSON.stringify(event),
@@ -17,5 +38,4 @@ exports.handler = function(event, context, callback) {
         else
             callback(null, data);
     });
-
 };
