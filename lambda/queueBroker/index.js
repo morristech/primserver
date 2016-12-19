@@ -23,7 +23,7 @@ exports.handler = function(event, context, callback) {
     if(event.numshapes) {
         var numshapes = parseInt(event.numshapes);
         if(numshapes < 1 || numshapes > 200) {
-            callback("The number of shapes is not acceptable");
+            callback("Invalid number of shapes");
             return;
         }
     }
