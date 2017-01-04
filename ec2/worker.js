@@ -1,8 +1,14 @@
 var aws = require('aws-sdk');
 var fs = require('fs');
 var exec = require('child_process').exec;
+var FCM = require('fcm').FCM;
 
-if(!process.env.ACC_KEY_ID || !process.env.SEC_ACCESS_KEY || !process.env.SQS_QUEUE || !process.env.S3_IN_BUCKET) {
+if(!process.env.ACC_KEY_ID ||
+       !process.env.SEC_ACCESS_KEY ||
+       !process.env.SQS_QUEUE ||
+       !process.env.S3_IN_BUCKET ||
+       !process.env.S3_OUT_BUCKET ||
+       !process.env.FCM_API_KEY) {
     console.log("The environment is not appropriatly set");
     return;
 }
@@ -16,7 +22,7 @@ aws.config = {
 var s3 = new aws.S3();
 var sqs = new aws.SQS();
 var queueUrl = process.env.SQS_QUEUE;
-
+var fcm = new FCM(process.env.FCM_API_KEY);
 
 setInterval(function() {
     receiveMessage()
@@ -48,8 +54,9 @@ var receiveMessage = function() {
 var processMessage = function(message, rcptHandle) {
     // param should be { Bucket: <bucket name>, Key: <key> }
     var params = {};
+    var msg = {};
     try {
-        var msg = JSON.parse(message);
+        msg = JSON.parse(message);
         params.Key = msg.filekey;
         params.Bucket = process.env.S3_IN_BUCKET
     } catch(error) {
@@ -65,7 +72,7 @@ var processMessage = function(message, rcptHandle) {
         var filePath = '/tmp/' + params.Key;
         var file = fs.createWriteStream(filePath);
         file.on('close', function() {
-            processOnFile('/tmp/', params.Key);
+            processOnFile('/tmp/', params.Key, msg.fcmtoken);
         });
         console.log("Downloading file --> " + params.Key);
         s3.getObject(params).createReadStream().on('error', function(err) {
@@ -77,7 +84,7 @@ var processMessage = function(message, rcptHandle) {
 };
 
 
-var processOnFile = function(tempFolder, fileKey) {
+var processOnFile = function(tempFolder, fileKey, fcmToken) {
     console.log("Processing: " + fileKey);
     var primitive = 'primitive -i ' + tempFolder + fileKey + ' -o ' + tempFolder + fileKey + '-out.jpg -n 50';
     //var primitive = spawn('ls', ['-l', '~']);
@@ -87,7 +94,51 @@ var processOnFile = function(tempFolder, fileKey) {
             return;
         }
         console.log("Success --> " + fileKey + '-out.jpg');
-        // TODO Upload to S3
+        uploadToS3(fileKey, fcmToken);
+    });
+};
+
+var uploadToS3 = function(fileKey, fcmToken) {
+    var fileName = '/tmp/' + fileKey + '-out.jpg';
+    fs.readFile(fileName, (err, fileData) => {
+        if(err) {
+            console.log(err);
+            console.log("Unable to read the result file, exiting");
+            return;
+        }        
+        var params = {};
+        params.Bucket = process.env.S3_OUT_BUCKET;
+        params.Key = fileKey;
+        params.Body = fileData;
+        params.ACL = 'public-read';
+        params.ContentType = 'image/jpeg';
+        s3.putObject(params, (err, data) => {
+            if(err) {
+                console.log(err);
+                console.log("Unable to upload output file to S3, exiting");
+                return;
+            }
+            console.log("Successfully uploaded output file");
+            sendNotification(fileKey, fcmToken);
+        });
+    }); 
+};
+
+var sendNotification = function(fileKey, fcmToken) {
+    console.log("Sending Notification : Filekey = " + fileKey + " FcmToken = " + fcmToken);
+    var message = {
+        registration_id: fcmToken,
+        collapse_key: "primitive_coll_key",
+        "data.image_key": fileKey
+    };
+
+    fcm.send(message, (err, messageId) => {
+        if(err) {
+            console.log(err);
+            console.log("Error sending notification");
+            return;
+        }
+        console.log("Notification sent --> " + messageId);
     });
 };
 
