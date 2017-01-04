@@ -6,8 +6,8 @@
   "dependencies": {
     "aws-sdk": "^2.7.7",
     "child_process": "^1.0.2",
-    "fcm": "^1.0.3",
-    "fs": "^0.0.1-security"
+    "fs": "^0.0.1-security",
+    "request": "^2.79.0"
   },
   "devDependencies": {},
   "scripts": {
