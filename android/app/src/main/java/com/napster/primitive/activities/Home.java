@@ -1,7 +1,9 @@
-package com.napster.primitive;
+package com.napster.primitive.activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.napster.primitive.R;
 
 public class Home extends AppCompatActivity {
 
