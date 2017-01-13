@@ -129,7 +129,7 @@ var sendNotification = function(fileKey, fcmToken) {
         method: 'POST',
         url: 'https://fcm.googleapis.com/fcm/send',
         headers: {
-            'Authorization': 'key=AAAAi1PgSdo:APA91bErsxJlZOYmgGZNv5y65qygLsI1e6RjJpx16ekPisAV8efd083IXPZvlGsSU3-R3F0ljjU2LahRWgzKbo-kXSTg0oDHx9NQJgQEE1Nt-KnffonL8yeWCkC8-oYCAeEi41kGM9KiX9GqI7GfC-pA2uCPqcrIxA',
+            'Authorization': 'key=' + process.env.FCM_AUTH,
             'Content-Type': 'application/json'
         },
         body: {
