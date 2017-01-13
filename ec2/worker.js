@@ -1,7 +1,7 @@
 var aws = require('aws-sdk');
 var fs = require('fs');
 var exec = require('child_process').exec;
-var FCM = require('fcm').FCM;
+var request = require('request');
 
 if(!process.env.ACC_KEY_ID ||
        !process.env.SEC_ACCESS_KEY ||
@@ -22,7 +22,6 @@ aws.config = {
 var s3 = new aws.S3();
 var sqs = new aws.SQS();
 var queueUrl = process.env.SQS_QUEUE;
-var fcm = new FCM(process.env.FCM_API_KEY);
 
 setInterval(function() {
     receiveMessage()
@@ -126,19 +125,29 @@ var uploadToS3 = function(fileKey, fcmToken) {
 
 var sendNotification = function(fileKey, fcmToken) {
     console.log("Sending Notification : Filekey = " + fileKey + " FcmToken = " + fcmToken);
-    var message = {
-        registration_id: fcmToken,
-        collapse_key: "primitive_coll_key",
-        "data.image_key": fileKey
+    var options = {
+        method: 'POST',
+        url: 'https://fcm.googleapis.com/fcm/send',
+        headers: {
+            'Authorization': 'key=' + process.env.FCM_AUTH,
+            'Content-Type': 'application/json'
+        },
+        body: {
+            to: fcmToken,
+            data: {
+                key: fileKey
+            }
+        },
+        json: true
     };
 
-    fcm.send(message, (err, messageId) => {
-        if(err) {
-            console.log(err);
+    request(options, function (error, response, body) {
+        if (error) {
+            console.log(error);
             console.log("Error sending notification");
             return;
         }
-        console.log("Notification sent --> " + messageId);
+        console.log(body);
     });
 };
 
